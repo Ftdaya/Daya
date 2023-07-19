@@ -1,1 +1,70 @@
+import React, { useState } from 'react';
+import {
+  Table,
+  Tbody,
+  Tr,
+  Td,
+  Th,
+  Select,
+} from '@chakra-ui/react';
 
+interface TableRowData {
+  name: string;
+  timestamp: number;
+  duration: number;
+  status: 'pending' | 'failed' | 'success';
+}
+interface DataTableProps {
+data: TableRowData[];
+}
+const DataTable: React.FC<DataTableProps> = ({ data }) => {
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'failed' | 'success'>('all');
+const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterStatus(event.target.value as 'all' | 'pending' | 'failed' | 'success');
+};
+const sortData = () => {
+    const sorted = [...data];
+    sorted.sort((a, b) => a.duration - b.duration);
+    return sorted;
+  };
+
+  const filteredAndSortedData = sortData().filter((row) => {
+    if (filterStatus === 'all') return true;
+    return row.status === filterStatus;
+  });
+
+  return (
+    <Table variant="simple">
+      <thead>
+        <Tr>
+          <Th>Name</Th>
+          <Th>Timestamp</Th>
+          <Th>Duration</Th>
+          <Th>Status</Th>
+        </Tr>
+      </thead>
+      <Tbody>
+        <Tr>
+          <Td>
+            <Select value={filterStatus} onChange={handleFilterChange}>
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="failed">Failed</option>
+              <option value="success">Success</option>
+            </Select>
+          </Td>
+        </Tr>
+        {filteredAndSortedData.map((row, index) => (
+          <Tr key={index}>
+            <Td>{row.name}</Td>
+            <Td>{row.timestamp}</Td>
+            <Td>{row.duration}</Td>
+            <Td>{row.status}</Td>
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
+  );
+};
+
+export default DataTable;
